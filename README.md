@@ -143,7 +143,7 @@ By combining data science with domain expertise in Formula 1 racing, this platfo
 
 ```bash
 # Clone the repository
-git clone https://github.com/yourusername/f1-ai-strategy-platform.git
+git clone https://github.com/srujan911/f1-ai-strategy-platform.git
 cd f1-ai-strategy-platform
 
 # Create virtual environment (recommended)
@@ -161,12 +161,22 @@ pip install -r requirements-dev.txt
 
 ## 🚀 Quick Start
 
-### Run the Dashboard
+### Run the Web Server
 ```bash
-streamlit run app/dashboard.py
+# Start the Flask API server
+python server.py
 ```
 
-The dashboard will open at `http://localhost:8501`
+The API server will start at `http://localhost:5000`
+
+### Run the Dashboard
+```bash
+# Using Make
+make run
+
+# Or directly with Streamlit
+streamlit run server.py
+```
 
 ### Use as a Library
 ```python
@@ -185,8 +195,7 @@ print(f"Degradation coefficients: {coeffs}")
 
 ```
 f1-ai-strategy-platform/
-├── app/
-│   └── dashboard.py              # Main Streamlit application
+├── server.py                     # Flask API server
 ├── src/
 │   ├── __init__.py
 │   ├── data_loader.py            # FastF1 data loading
@@ -196,25 +205,31 @@ f1-ai-strategy-platform/
 │   │   └── multi_race_analysis.py # Cross-race analysis
 │   ├── models/
 │   │   ├── lap_time_model.py     # Lap time prediction
-│   │   └── tyre_deg_model.py     # Tyre degradation
+│   │   └── tyre_deg_model.py     # Tyre degradation modeling
 │   ├── strategy/
-│   │   └── pit_strategy.py       # Strategy optimization
+│   │   ├── pit_strategy.py       # Pit stop optimization
+│   │   ├── recommendation.py     # Strategy recommendations
+│   │   └── simulation_engine.py  # Race simulation engine
 │   └── prediction/
-│       └── 2026_strategy.py      # Seasonal predictions
+│       ├── 2026_strategy.py      # 2026 season predictions
+│       └── outcome_simulator.py  # Race outcome simulation
 ├── data/
-│   ├── raw/                      # FastF1 cache data
-│   └── processed/                # Processed datasets
+│   ├── raw/                      # FastF1 cache (2024-2025 races)
+│   └── processed/                # Processed lap datasets
 ├── notebooks/
 │   ├── 01_data_exploration.ipynb
 │   ├── 02_feature_engineering.ipynb
 │   ├── 03_model_training.ipynb
 │   └── 04_strategy_analysis.ipynb
+├── static/                       # Frontend assets (CSS, JS)
+├── templates/                    # HTML templates
+├── visualizations/               # Generated charts and graphs
 ├── tests/                        # Unit tests
-├── .gitignore
-├── LICENSE
-├── README.md
+├── docs/                         # Documentation
+├── Makefile                      # Build automation
 ├── requirements.txt
 ├── requirements-dev.txt
+├── pyproject.toml
 └── setup.py
 ```
 
@@ -289,8 +304,8 @@ This is an educational project for analyzing F1 race data. It is not affiliated 
 
 ## 📧 Contact
 
-- **GitHub Issues**: [Report bugs or suggest features](https://github.com/yourusername/f1-ai-strategy-platform/issues)
-- **Email**: your.email@example.com
+- **GitHub Issues**: [Report bugs or suggest features](https://github.com/srujan911/f1-ai-strategy-platform/issues)
+- **GitHub**: [@srujan911](https://github.com/srujan911)
 
 ---
 
