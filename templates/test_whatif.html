@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>What-If Test</title>
+    <style>
+        body { font-family: monospace; background: #1a1a1a; color: #00ff00; padding: 20px; }
+        .output { background: #000; padding: 10px; margin: 10px 0; border: 1px solid #00ff00; max-height: 400px; overflow-y: auto; }
+        .success { color: #00ff00; }
+        .error { color: #ff0000; }
+        .warning { color: #ffff00; }
+    </style>
+</head>
+<body>
+<h1>What-If Simulation Test</h1>
+<button onclick="testSimulation()">Test Simulation</button>
+<button onclick="clearOutput()">Clear Output</button>
+<div id="output" class="output"></div>
+
+<script>
+    let outputDiv = document.getElementById('output');
+    
+    function log(msg, type = 'info') {
+        const line = document.createElement('div');
+        line.className = type === 'error' ? 'error' : type === 'success' ? 'success' : type === 'warning' ? 'warning' : '';
+        line.textContent = '[' + new Date().toLocaleTimeString() + '] ' + msg;
+        outputDiv.appendChild(line);
+        outputDiv.scrollTop = outputDiv.scrollHeight;
+    }
+    
+    function clearOutput() {
+        outputDiv.innerHTML = '';
+    }
+    
+    async function testSimulation() {
+        log('=== STARTING TEST ===', 'warning');
+        
+        try {
+            const year = '2025';
+            const gpName = 'Australian_Grand_Prix';
+            const params = {
+                deg_multiplier: 1.1,
+                track_temperature: 1.0,
+                traffic_factor: 1.0,
+                safety_car_probability: 0.1,
+                pit_loss: 22.0
+            };
+            
+            log(`Calling /api/strategy/simulate/${year}/${gpName}`, 'warning');
+            log(`Payload: ${JSON.stringify(params)}`);
+            
+            const response = await fetch(`/api/strategy/simulate/${year}/${gpName}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(params),
+                timeout: 60000
+            });
+            
+            log(`Response status: ${response.status}`, response.status === 200 ? 'success' : 'error');
+            
+            const data = await response.json();
+            
+            log(`Response keys: ${Object.keys(data).join(', ')}`, 'success');
+            log(`Strategies: ${data.strategies ? data.strategies.length + ' items' : 'MISSING'}`, data.strategies ? 'success' : 'error');
+            log(`Recommendation: ${data.recommendation ? 'PRESENT' : 'MISSING'}`, data.recommendation ? 'success' : 'error');
+            log(`Metadata: ${data.metadata ? 'PRESENT' : 'MISSING'}`, data.metadata ? 'success' : 'error');
+            
+            if (data.strategies && data.strategies.length > 0) {
+                const s = data.strategies[0];
+                log(`First strategy:`, 'warning');
+                log(`  - label: ${s.label}`);
+                log(`  - variant: ${s.variant}`);
+                log(`  - pit_laps: ${JSON.stringify(s.pit_laps)}`);
+                log(`  - compounds: ${JSON.stringify(s.compounds)}`);
+                log(`  - total_time: ${s.total_time}`);
+            }
+            
+            if (data.recommendation && data.recommendation.recommended) {
+                const rec = data.recommendation.recommended;
+                log(`Recommendation:`, 'warning');
+                log(`  - compounds: ${JSON.stringify(rec.compounds)}`);
+                log(`  - pit_laps: ${JSON.stringify(rec.pit_laps)}`);
+                log(`  - confidence: ${data.recommendation.confidence}`);
+            }
+            
+            log('=== TEST COMPLETE ===', 'success');
+            
+        } catch (error) {
+            log(`ERROR: ${error.message}`, 'error');
+            log(`Stack: ${error.stack}`, 'error');
+        }
+    }
+    
+    log('Test page loaded. Click "Test Simulation" to run.', 'warning');
+</script>
+</body>
+</html>

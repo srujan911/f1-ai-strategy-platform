@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>F1 AI Strategy Platform | Professional Analytics</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <span class="logo-icon">🏎️</span>
+                    <h1>F1 AI Strategy Platform</h1>
+                </div>
+                <nav class="nav">
+                    <a href="#analytics" class="nav-link active">Analytics</a>
+                    <a href="#predictions" class="nav-link">2026 Predictions</a>
+                    <a href="#about" class="nav-link">About</a>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="container">
+            
+            <!-- Dashboard Controls -->
+            <section class="control-panel">
+                <div class="panel-card">
+                    <h2 class="section-title">Race Selection</h2>
+                    <div class="control-grid">
+                        <div class="form-group">
+                            <label for="yearSelect">Season</label>
+                            <select id="yearSelect" class="select-input">
+                                <option value="">Loading...</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="raceSelect">Grand Prix</label>
+                            <select id="raceSelect" class="select-input">
+                                <option value="">Select season first</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <button id="loadRaceBtn" class="btn btn-primary" disabled>
+                                <span class="btn-text">Analyze Race</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="panel-card" id="whatIfPanel">
+                    <h2 class="section-title">What-If Simulation Controls</h2>
+                    <div class="control-grid">
+                        <div class="form-group">
+                            <label for="trackTempInput">Track Temperature Factor</label>
+                            <input type="range" id="trackTempInput" min="0.9" max="1.1" step="0.01" value="1.0">
+                            <div class="range-value" id="trackTempValue">1.00x</div>
+                        </div>
+                        <div class="form-group">
+                            <label for="pitLossInput">Pit Stop Delta (s)</label>
+                            <input type="range" id="pitLossInput" min="18" max="28" step="0.5" value="22">
+                            <div class="range-value" id="pitLossValue">22.0s</div>
+                        </div>
+                        <div class="form-group">
+                            <label for="safetyCarInput">Safety Car Probability</label>
+                            <input type="range" id="safetyCarInput" min="0" max="0.6" step="0.05" value="0">
+                            <div class="range-value" id="safetyCarValue">0%</div>
+                        </div>
+                        <div class="form-group">
+                            <label for="degMultiplierInput">Degradation Multiplier</label>
+                            <input type="range" id="degMultiplierInput" min="0.8" max="1.2" step="0.02" value="1">
+                            <div class="range-value" id="degMultiplierValue">1.00x</div>
+                        </div>
+                        <div class="form-group">
+                            <label for="trafficInput">Traffic / Clean Air</label>
+                            <input type="range" id="trafficInput" min="0.9" max="1.2" step="0.02" value="1">
+                            <div class="range-value" id="trafficValue">1.00x</div>
+                        </div>
+                        <div class="form-group">
+                            <button id="runWhatIfBtn" class="btn btn-primary" disabled>
+                                <span class="btn-text">Run What-If</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Race Overview Cards -->
+            <section id="raceOverview" class="stats-section hidden">
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon">🏁</div>
+                        <div class="stat-content">
+                            <h3 class="stat-label">Total Laps</h3>
+                            <p class="stat-value" id="totalLaps">-</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">⚡</div>
+                        <div class="stat-content">
+                            <h3 class="stat-label">Fastest Lap</h3>
+                            <p class="stat-value" id="fastestLap">-</p>
+                            <p class="stat-sublabel" id="fastestDriver">-</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">👥</div>
+                        <div class="stat-content">
+                            <h3 class="stat-label">Drivers</h3>
+                            <p class="stat-value" id="driverCount">-</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">🔴</div>
+                        <div class="stat-content">
+                            <h3 class="stat-label">Compounds Used</h3>
+                            <p class="stat-value" id="compoundCount">-</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Analysis Tabs -->
+            <section id="analysisSection" class="analysis-section hidden">
+                <div class="tabs">
+                    <button class="tab-btn active" data-tab="tyres">Tyre Analysis</button>
+                    <button class="tab-btn" data-tab="strategy">Pit Strategy</button>
+                    <button class="tab-btn" data-tab="laptime">Lap Time Model</button>
+                    <button class="tab-btn" data-tab="drivers">Driver Compare</button>
+                    <button class="tab-btn" data-tab="explain">Explainability</button>
+                    <button class="tab-btn" data-tab="predictions">2026 Predictions</button>
+                </div>
+
+                <!-- Tyre Analysis Tab -->
+                <div id="tyres" class="tab-content active">
+                    <div class="chart-container">
+                        <h3 class="chart-title">Tyre Degradation Analysis</h3>
+                        <div class="chart-description">
+                            Polynomial regression models showing performance degradation over tyre life for each compound
+                        </div>
+                        <div id="tyreDegradationChart" class="chart"></div>
+                    </div>
+                </div>
+
+                <!-- Pit Strategy Tab -->
+                <div id="strategy" class="tab-content">
+                    <div class="strategy-grid">
+                        <div class="strategy-card">
+                            <h3 class="chart-title">Optimal Pit Strategy</h3>
+                            <div id="strategyDetails" class="strategy-details">
+                                <p class="loading-text">Select a race to optimize pit strategy...</p>
+                            </div>
+                        </div>
+                        <div class="strategy-card">
+                            <h3 class="chart-title">Race Simulation</h3>
+                            <div id="raceSimChart" class="chart"></div>
+                        </div>
+                        <div class="strategy-card ai-verdict-card">
+                            <h3 class="chart-title">AI Verdict</h3>
+                            <div id="aiVerdict" class="ai-verdict">
+                                <p class="loading-text">Run a what-if simulation to get an AI recommendation.</p>
+                            </div>
+                        </div>
+                        <div class="strategy-card">
+                            <h3 class="chart-title">Top Strategies</h3>
+                            <div id="strategyTable" class="strategy-table"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Lap Time Model Tab -->
+                <div id="laptime" class="tab-content">
+                    <div class="chart-container">
+                        <h3 class="chart-title">Machine Learning Model Performance</h3>
+                        <div class="chart-description">
+                            Random Forest model trained on race telemetry data for lap time prediction
+                        </div>
+                        <div class="forecast-grid">
+                            <div id="lapTimeResults" class="model-results">
+                                <p class="loading-text">Select a race to train the model...</p>
+                            </div>
+                            <div id="lapTimeForecast" class="model-results">
+                                <p class="loading-text">Forecast next laps after training...</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Driver Compare Tab -->
+                <div id="drivers" class="tab-content">
+                    <div class="chart-container">
+                        <h3 class="chart-title">Driver Comparison Mode</h3>
+                        <div class="chart-description">Compare tyre degradation and stint pace between two drivers.</div>
+                        <div class="control-grid">
+                            <div class="form-group">
+                                <label for="driverASelect">Driver A</label>
+                                <select id="driverASelect" class="select-input"></select>
+                            </div>
+                            <div class="form-group">
+                                <label for="driverBSelect">Driver B</label>
+                                <select id="driverBSelect" class="select-input"></select>
+                            </div>
+                            <div class="form-group">
+                                <button id="compareDriversBtn" class="btn btn-primary" disabled>
+                                    <span class="btn-text">Compare Drivers</span>
+                                </button>
+                            </div>
+                        </div>
+                        <div id="driverComparison" class="model-results">
+                            <p class="loading-text">Select drivers to compare.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Explainability Tab -->
+                <div id="explain" class="tab-content">
+                    <div class="chart-container">
+                        <h3 class="chart-title">Explainability & Transparency</h3>
+                        <div class="chart-description">Feature importance for ML models and strategy rationale.</div>
+                        <div class="explain-grid">
+                            <div class="model-results" id="featureImportance">
+                                <p class="loading-text">Train a model to view feature importance.</p>
+                            </div>
+                            <div class="model-results" id="strategyExplain">
+                                <p class="loading-text">Run strategy simulation to see AI reasoning.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 2026 Predictions Tab -->
+                <div id="predictions" class="tab-content">
+                    <div class="predictions-grid">
+                        <div class="prediction-card">
+                            <h3 class="chart-title">Team Strategy Predictions</h3>
+                            <div id="teamPredictions" class="team-predictions"></div>
+                        </div>
+                        <div class="prediction-card">
+                            <h3 class="chart-title">Degradation Trends</h3>
+                            <div id="degradationTrends" class="degradation-trends"></div>
+                        </div>
+                        <div class="prediction-card">
+                            <h3 class="chart-title">Race Outcome Probabilities</h3>
+                            <div id="raceOutcomes" class="degradation-trends"></div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <p>&copy; 2026 F1 AI Strategy Platform | Machine Learning • Data Science • Formula 1</p>
+                <p class="footer-tech">Built with Python, Flask, scikit-learn, FastF1 | Professional Analytics Dashboard</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Loading Overlay -->
+    <div id="loadingOverlay" class="loading-overlay hidden">
+        <div class="loading-spinner">
+            <div class="spinner"></div>
+            <p>Processing race data...</p>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+</body>
+</html>
