@@ -30,7 +30,7 @@ Formula 1 race strategy is one of the most critical factors in determining race 
 - **Model tyre degradation** curves for different compounds across various circuits
 - **Optimize pit strategies** by simulating multiple stop scenarios
 - **Analyze multi-track patterns** to understand how different circuits affect tyre behavior
-- **Visualize insights** through an interactive Streamlit dashboard
+- **Visualize insights** through an interactive Flask web dashboard
 
 By combining data science with domain expertise in Formula 1 racing, this platform enables data-driven decision making for strategy optimization.
 
@@ -59,10 +59,11 @@ By combining data science with domain expertise in Formula 1 racing, this platfo
 - **Cross-Circuit Comparison**: Analyzes degradation patterns across different tracks
 - **Trend Identification**: Identifies correlations between track characteristics and tyre wear
 
-### 🖥️ Interactive Dashboard
-- **Streamlit UI**: Real-time visualization of race data and predictions
+### 🖥️ Interactive Web Dashboard
+- **Flask Web UI**: Real-time visualization of race data and predictions with REST API
 - **Dynamic Controls**: Select tracks, compounds, and view strategy analysis
 - **Multiple Views**: Lap time predictions, tyre degradation curves, strategy simulations
+- **What-If Analysis**: Simulate different race scenarios and strategy outcomes
 
 ---
 
@@ -94,8 +95,8 @@ By combining data science with domain expertise in Formula 1 racing, this platfo
                         └────────┬─────────┘
                                  │
                         ┌────────▼─────────┐
-                        │ Streamlit UI     │
-                        │ Visualization    │
+                        │ Flask Web UI     │
+                        │ + REST API       │
                         └──────────────────┘
 ```
 
@@ -110,7 +111,7 @@ By combining data science with domain expertise in Formula 1 racing, this platfo
 | `strategy/pit_strategy.py` | Strategy optimization | `optimize_pit_strategy()`, `should_pit()` |
 | `visualization.py` | Plotting utilities | `plot_tyre_degradation()`, `plot_race_strategy()` |
 | `analysis/multi_race_analysis.py` | Cross-race analysis | `compare_tracks()` |
-| `dashboard.py` | Main UI application | Streamlit app with all features |
+| `server.py` | Main web application | Flask API server with REST endpoints |
 
 ---
 
@@ -119,11 +120,11 @@ By combining data science with domain expertise in Formula 1 racing, this platfo
 ### Core Dependencies
 - **Python 3.8+** - Programming language
 - **FastF1** - F1 telemetry data provider
+- **Flask** - Web framework and REST API
 - **Pandas** - Data manipulation and analysis
 - **NumPy** - Numerical computing
 - **Scikit-learn** - Machine learning models
 - **Plotly** - Interactive visualizations
-- **Streamlit** - Web UI framework
 
 ### Development Tools
 - **pytest** - Unit testing framework
@@ -169,14 +170,13 @@ python server.py
 
 The API server will start at `http://localhost:5000`
 
-### Run the Dashboard
+### Run with Make
 ```bash
-# Using Make
+# Using Make for development
 make run
-
-# Or directly with Streamlit
-streamlit run server.py
 ```
+
+Open your browser and navigate to `http://localhost:5000` to access the dashboard.
 
 ### Use as a Library
 ```python
@@ -312,5 +312,5 @@ This is an educational project for analyzing F1 race data. It is not affiliated 
 ## 🙏 Acknowledgments
 
 - [FastF1](https://github.com/theOehrly/Fast-F1) - F1 telemetry data
-- [Streamlit](https://streamlit.io/) - UI framework
+- [Flask](https://flask.palletsprojects.com/) - Web framework
 - [Scikit-learn](https://scikit-learn.org/) - Machine learning
