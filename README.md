@@ -195,42 +195,48 @@ print(f"Degradation coefficients: {coeffs}")
 
 ```
 f1-ai-strategy-platform/
-├── server.py                     # Flask API server
+├── .flake8
+├── .gitignore
+├── CHANGELOG.md
+├── CONTRIBUTING.md
+├── LICENSE
+├── Makefile
+├── README.md
+├── pyproject.toml
+├── requirements.txt
+├── requirements-dev.txt
+├── setup.cfg
+├── setup.py
+├── server.py                     # Flask API server (main entrypoint)
+├── data/
+│   ├── processed/                # Processed datasets
+│   └── raw/                      # FastF1 cache data
+├── docs/                         # Documentation
+├── notebooks/                    # Analysis notebooks
 ├── src/
 │   ├── __init__.py
-│   ├── data_loader.py            # FastF1 data loading
-│   ├── feature_engineering.py    # Data preprocessing
-│   ├── visualization.py          # Plotting utilities
 │   ├── analysis/
-│   │   └── multi_race_analysis.py # Cross-race analysis
+│   │   └── multi_race_analysis.py
 │   ├── models/
-│   │   ├── lap_time_model.py     # Lap time prediction
-│   │   └── tyre_deg_model.py     # Tyre degradation modeling
+│   │   ├── lap_time_model.py
+│   │   └── tyre_deg_model.py
+│   ├── prediction/
+│   │   ├── 2026_strategy.py
+│   │   └── outcome_simulator.py
 │   ├── strategy/
-│   │   ├── pit_strategy.py       # Pit stop optimization
-│   │   ├── recommendation.py     # Strategy recommendations
-│   │   └── simulation_engine.py  # Race simulation engine
-│   └── prediction/
-│       ├── 2026_strategy.py      # 2026 season predictions
-│       └── outcome_simulator.py  # Race outcome simulation
-├── data/
-│   ├── raw/                      # FastF1 cache (2024-2025 races)
-│   └── processed/                # Processed lap datasets
-├── notebooks/
-│   ├── 01_data_exploration.ipynb
-│   ├── 02_feature_engineering.ipynb
-│   ├── 03_model_training.ipynb
-│   └── 04_strategy_analysis.ipynb
+│   │   ├── pit_strategy.py
+│   │   ├── recommendation.py
+│   │   └── simulation_engine.py
+│   ├── data_loader.py
+│   ├── feature_engineering.py
+│   └── visualization.py
 ├── static/                       # Frontend assets (CSS, JS)
 ├── templates/                    # HTML templates
 ├── visualizations/               # Generated charts and graphs
-├── tests/                        # Unit tests
-├── docs/                         # Documentation
-├── Makefile                      # Build automation
-├── requirements.txt
-├── requirements-dev.txt
-├── pyproject.toml
-└── setup.py
+├── tests/                        # Unit tests (tests/ and root test_*.py)
+├── test_api.py
+├── test_endpoint.py
+└── test_fastest_lap.py
 ```
 
 ---
